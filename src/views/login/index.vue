@@ -1,14 +1,15 @@
 <template>
   <div class="login">
-    <el-form class="form" :model="form">
-      <el-form-item>
+    <el-form ref="form" class="form" :model="form" :rules="rules">
+      <el-form-item prop="account">
         <el-input v-model="form.account" placeholder="账号"></el-input>
       </el-form-item>
-      <el-form-item>
+      <el-form-item prop="password">
         <el-input
           v-model="form.password"
           placeholder="密码"
           type="password"
+          @keyup.enter.native="onSubmit"
         ></el-input>
       </el-form-item>
       <el-form-item>
@@ -22,38 +23,48 @@
 
 <script lang="ts">
 import axios from "axios";
+import { Vue, Component } from "vue-property-decorator";
 
 interface formType {
   account: string;
   password: string;
 }
 
-interface dataType {
-  form: formType;
+@Component
+export default class Login extends Vue {
+  form: formType = {
+    account: "",
+    password: "",
+  };
+
+  rules = {
+    account: [{ required: true, message: "请输入账号", trigger: "blur" }],
+    password: [{ required: true, message: "请输入密码", trigger: "blur" }],
+  };
+
+  onSubmit(): void {
+    let form = this.$refs.form as any;
+
+    form.validate((valid: any) => {
+      if (valid) {
+        let req = axios.post("/api/login", {
+          account: this.form.account,
+          password: this.form.password,
+        });
+
+        req.then((res) => {
+          if (res.data.success) {
+            localStorage.setItem("isLogined", "true");
+
+            this.$router.push({ name: "Main" });
+          } else if (res.data.errorMsg) {
+            this.$message.error(res.data.errorMsg);
+          }
+        });
+      }
+    });
+  }
 }
-
-export default {
-  data(): dataType {
-    return {
-      form: {
-        account: "",
-        password: "",
-      },
-    };
-  },
-  methods: {
-    onSubmit(): void {
-      let req = axios.post("/api/login", {
-        account: 'admin',
-        password: 'admin',
-      });
-
-      req.then((res) => {
-        console.log("res = ", res);
-      });
-    },
-  },
-};
 </script>
 
 <style lang="less" scoped>
