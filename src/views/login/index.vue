@@ -22,8 +22,8 @@
 </template>
 
 <script lang="ts">
-import axios from "axios";
 import { Vue, Component } from "vue-property-decorator";
+import axios from "../../util/require/index";
 
 interface formType {
   account: string;
@@ -43,8 +43,10 @@ export default class Login extends Vue {
   };
 
   onSubmit(): void {
+    // eslint-disable-next-line
     let form = this.$refs.form as any;
 
+    // eslint-disable-next-line
     form.validate((valid: any) => {
       if (valid) {
         let req = axios.post("/api/login", {
@@ -52,7 +54,8 @@ export default class Login extends Vue {
           password: this.form.password,
         });
 
-        req.then((res) => {
+        // eslint-disable-next-line
+        req.then((res: any) => {
           if (res.data.success) {
             localStorage.setItem("isLogined", "true");
 
