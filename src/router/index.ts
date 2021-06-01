@@ -29,7 +29,7 @@ const router = new VueRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const isLogined = localStorage.getItem("isLogined");
+  const isLogined = localStorage.getItem("token");
 
   if (!isLogined && to.name != "Login") {
     next({ path: "/Login" });

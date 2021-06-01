@@ -1,4 +1,5 @@
 import axios from "axios";
+import router from "../../router";
 
 let instance = axios.create();
 
@@ -17,10 +18,13 @@ instance.interceptors.request.use(
 
 instance.interceptors.response.use(
   (response) => {
-    // if (response.data.code) {
-    //   switch (response.data.code) {
-    //   }
-    // }
+    if (response.data.code) {
+      switch (response.data.code) {
+        case 402:
+          router.push({ name: "Login" });
+          break;
+      }
+    }
     return response;
   },
   (error) => {

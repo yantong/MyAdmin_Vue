@@ -57,7 +57,7 @@ export default class Login extends Vue {
         // eslint-disable-next-line
         req.then((res: any) => {
           if (res.data.success) {
-            localStorage.setItem("isLogined", "true");
+            localStorage.setItem("token", res.data.token);
 
             this.$router.push({ name: "Main" });
           } else if (res.data.errorMsg) {
