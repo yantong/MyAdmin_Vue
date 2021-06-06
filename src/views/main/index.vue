@@ -1,6 +1,8 @@
 <template>
   <el-container class="main">
-    <el-aside class="aside"> </el-aside>
+    <el-aside class="aside">
+      <SideMenu :menus="mainRouter" />
+    </el-aside>
     <el-container class="container">
       <el-header class="header">
         <div class="left"></div>
@@ -24,10 +26,17 @@
 import { AxiosResponse } from "axios";
 import { Vue, Component } from "vue-property-decorator";
 import axios from "../../util/require";
+import SideMenu from "../../components/menu.vue";
+import mainRouter from "../../router/mainRouter";
 
-@Component
+@Component({
+  components: {
+    SideMenu,
+  },
+})
 export default class Login extends Vue {
   headerImg = require("../../assets/user.png");
+  mainRouter = mainRouter;
 
   created(): void {
     let req = axios.post("/api/getUserInfo", {
@@ -90,6 +99,7 @@ export default class Login extends Vue {
 
     .route {
       background: #e9eef3;
+      padding: 0;
     }
   }
 }
