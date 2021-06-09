@@ -2,23 +2,14 @@
 import { VNode } from "vue";
 import { Vue, Component, Prop } from "vue-property-decorator";
 import router from "../router";
-
-interface menu {
-  path: string;
-  name: string;
-  meta: {
-    text: string;
-    permission: boolean;
-  };
-  children: menu[];
-}
+import { RouteConfig } from "vue-router";
 
 @Component
 export default class SideMenu extends Vue {
-  @Prop({ default: () => [] }) readonly menus!: menu[];
+  @Prop({ default: () => [] }) readonly menus!: RouteConfig[];
 
-  getDefaultIndex(menus: menu[]): string {
-    let index = "";
+  getDefaultIndex(menus: RouteConfig[]): string | undefined {
+    let index = undefined;
 
     for (const i in this.menus) {
       const element = menus[i];
@@ -26,10 +17,10 @@ export default class SideMenu extends Vue {
       if (element.children) {
         index = this.getDefaultIndex(element.children);
       } else {
-        index = element.meta.permission ? element.name : "";
+        index = element.meta?.permission ? element.name : "";
       }
 
-      if (index != "") {
+      if (index) {
         router
           .push({
             name: index,
@@ -44,9 +35,9 @@ export default class SideMenu extends Vue {
     return index;
   }
 
-  getItem(data: menu): VNode {
+  getItem(data: RouteConfig): VNode | null {
     if (data.children?.length) {
-      return (
+      return data.meta?.permission ? (
         <el-submenu index={data.name}>
           <template slot="title">
             <span>{data.meta.text}</span>
@@ -55,13 +46,13 @@ export default class SideMenu extends Vue {
             {data.children.map((item) => this.getItem(item))}
           </el-menu-item-group>
         </el-submenu>
-      );
+      ) : null;
     } else {
-      return (
+      return data.meta?.permission ? (
         <el-menu-item index={data.name} route={data}>
           <span slot="title">{data.meta.text}</span>
         </el-menu-item>
-      );
+      ) : null;
     }
   }
 

@@ -1,7 +1,7 @@
 <template>
   <el-container class="main">
     <el-aside class="aside">
-      <SideMenu :menus="mainRouter" />
+      <SideMenu v-if="menu" :menus="menu" />
     </el-aside>
     <el-container class="container">
       <el-header class="header">
@@ -28,6 +28,9 @@ import { Vue, Component } from "vue-property-decorator";
 import axios from "../../util/require";
 import SideMenu from "../../components/menu.vue";
 import mainRouter from "../../router/mainRouter";
+import { RouteConfig } from "vue-router";
+import { userRouter } from "../../define/index";
+import store from "../../store/index";
 
 @Component({
   components: {
@@ -36,7 +39,8 @@ import mainRouter from "../../router/mainRouter";
 })
 export default class Login extends Vue {
   headerImg = require("../../assets/user.png");
-  mainRouter = mainRouter;
+  menu: RouteConfig[] = [];
+  routerPers: userRouter[] = [];
 
   created(): void {
     let req = axios.post("/api/getUserInfo", {
@@ -44,8 +48,32 @@ export default class Login extends Vue {
     });
 
     req.then((res: AxiosResponse) => {
-      console.log("res.data = ", res.data);
+      let router = JSON.parse(JSON.stringify(mainRouter));
+
+      this.routerPers = res.data.info.router;
+      router.forEach((item: RouteConfig) => {
+        this.getPermission(item);
+      });
+      this.menu = router;
+      store.commit({
+        type: "setRouterPers",
+        routerPers: this.routerPers,
+      });
     });
+  }
+
+  getPermission(router: RouteConfig): boolean {
+    if (!router.children && router.name) {
+      return (router.meta.permission = this.routerPers.some(
+        (item) => item.router == router.name
+      ));
+    }
+
+    return (
+      (router.meta.permission = router.children?.some((item) => {
+        return this.getPermission(item);
+      })) || false
+    );
   }
 
   handleCommand(command: string): void {
