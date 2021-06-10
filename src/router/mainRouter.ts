@@ -1,8 +1,18 @@
 import AuthCreate from "../views/auth/create/index.vue";
 import EmptyView from "../views/empty/index.vue";
+// import Main from "../views/main/page.vue";
 import { RouteConfig } from "vue-router";
+import buttons from "../components/selfButton/buttons";
 
 const main: RouteConfig[] = [
+  // {
+  //   path: "/main",
+  //   name: "MainPage",
+  //   meta: {
+  //     text: "首页",
+  //   },
+  //   component: Main,
+  // },
   {
     path: "/Auth",
     name: "Auth",
@@ -16,6 +26,7 @@ const main: RouteConfig[] = [
         name: "AuthCreater",
         meta: {
           text: "权限创建",
+          buttons: [buttons.SUBMIT],
         },
         component: AuthCreate,
       },

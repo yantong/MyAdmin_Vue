@@ -50,7 +50,7 @@ export default class Login extends Vue {
     req.then((res: AxiosResponse) => {
       let router = JSON.parse(JSON.stringify(mainRouter));
 
-      this.routerPers = res.data.info.router;
+      this.routerPers = res?.data?.info?.router || [];
       router.forEach((item: RouteConfig) => {
         this.getPermission(item);
       });
@@ -63,7 +63,7 @@ export default class Login extends Vue {
   }
 
   getPermission(router: RouteConfig): boolean {
-    if (!router.children && router.name) {
+    if (!router.children) {
       return (router.meta.permission = this.routerPers.some(
         (item) => item.router == router.name
       ));
@@ -126,7 +126,7 @@ export default class Login extends Vue {
     }
 
     .route {
-      background: #e9eef3;
+      background: white;
       padding: 0;
     }
   }

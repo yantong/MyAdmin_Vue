@@ -11,7 +11,7 @@ export default class SideMenu extends Vue {
   getDefaultIndex(menus: RouteConfig[]): string | undefined {
     let index = undefined;
 
-    for (const i in this.menus) {
+    for (const i in menus) {
       const element = menus[i];
 
       if (element.children) {
