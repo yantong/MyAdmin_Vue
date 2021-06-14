@@ -13,7 +13,7 @@
           :data="mainRouter"
           show-checkbox
           node-key="name"
-          :default-checked-keys="[]"
+          :default-checked-keys="selKeys"
           @check-change="checkChange"
         >
           <span class="custom-tree-node" slot-scope="{ data }">
@@ -27,8 +27,9 @@
                 <el-checkbox
                   v-for="item in data.meta.buttons"
                   :key="item.permission"
-                  :label="item.text"
-                ></el-checkbox>
+                  :label="item.permission"
+                  >{{ item.text }}</el-checkbox
+                >
               </el-checkbox-group>
             </div>
           </span>
@@ -39,11 +40,15 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
+import { Vue, Component, Prop } from "vue-property-decorator";
 import mainRouter from "../../../router/mainRouter";
 import SelfButton from "../../../components/selfButton/selfButton.vue";
 import buttons from "../../../components/selfButton/buttons";
-import { AuthCreateType, userAuthData } from "../../../define/index";
+import {
+  AuthCreateType,
+  userAuthData,
+  userRouter,
+} from "../../../define/index";
 import { RouteConfig } from "vue-router";
 
 @Component({
@@ -52,13 +57,20 @@ import { RouteConfig } from "vue-router";
   },
 })
 export default class AuthCreate extends Vue implements AuthCreateType {
+  @Prop() readonly userName!: string;
+  @Prop() readonly userRouters!: userRouter[];
+
   mainRouter = JSON.parse(JSON.stringify(mainRouter));
   buttons = buttons;
+  selKeys: string[] = [];
   checkList = [];
   name = "";
-  permission = {};
 
   created(): void {
+    if (this.userName) {
+      this.name = this.userName;
+    }
+    this.selKeys = this.userRouters.map((item) => item.router);
     this.initMianRouter(this.mainRouter);
   }
 
@@ -69,28 +81,56 @@ export default class AuthCreate extends Vue implements AuthCreateType {
       if (element.children) {
         this.initMianRouter(element.children);
       } else {
-        this.$set(element.meta, "buttonsCheckList", []);
+        let data = this.userRouters?.filter((item) => {
+          return item.router == element.name;
+        });
+
+        this.$set(element.meta, "checked", !!(data && data.length));
+        this.$set(
+          element.meta,
+          "buttonsCheckList",
+          (data && data[0]?.buttons.split(",")) || []
+        );
       }
     }
 
     return;
   }
 
-  // eslint-disable-next-line
-  // checkChange(data: any, isChecked: boolean,): void {
-  //   let router = data.name;
-  //   console.log(data, isChecked);
-  // }
+  checkChange(data: RouteConfig, isChecked: boolean): void {
+    this.setChildren(data, isChecked);
+  }
+
+  setChildren(router: RouteConfig, checked: boolean): void {
+    if (!router.children || !router.children.length) {
+      router.meta.checked = checked;
+    } else {
+      router.children?.forEach((item) => {
+        this.setChildren(item, checked);
+      });
+    }
+  }
+
+  getChildren(router: RouteConfig, chidren: RouteConfig[]): void {
+    if ((!router.children || !router.children.length) && router.meta?.checked) {
+      chidren.push(router);
+    } else {
+      router.children?.forEach((item) => {
+        this.getChildren(item, chidren);
+      });
+    }
+  }
 
   getData(): userAuthData {
-    console.log({
-      name: this.name,
-      permission: this.mainRouter,
+    let permission: RouteConfig[] = [];
+
+    this.mainRouter.forEach((element: RouteConfig) => {
+      this.getChildren(element, permission);
     });
 
     return {
       name: this.name,
-      permission: this.mainRouter,
+      permission: permission,
     };
   }
 }

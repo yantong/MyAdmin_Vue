@@ -43,9 +43,7 @@ export default class Login extends Vue {
   routerPers: userRouter[] = [];
 
   created(): void {
-    let req = axios.post("/api/getUserInfo", {
-      account: "admin",
-    });
+    let req = axios.get("/api/getUserInfo");
 
     req.then((res: AxiosResponse) => {
       let router = JSON.parse(JSON.stringify(mainRouter));

@@ -15,9 +15,14 @@ export interface storeSate {
 
 export interface userAuthData {
   name: string;
-  permission: RouteConfig;
+  permission: RouteConfig[];
 }
 
 export interface AuthCreateType {
   getData(): userAuthData;
+}
+
+export interface commonObject {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  [key: string]: any;
 }

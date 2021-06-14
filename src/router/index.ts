@@ -4,6 +4,7 @@ import Login from "../views/login/index.vue";
 import NotFound from "../views/404/index.vue";
 import Main from "../views/main/index.vue";
 import mainRouter from "./mainRouter";
+import store from "../store/index";
 
 Vue.use(VueRouter);
 
@@ -41,9 +42,12 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
   const isLogined = localStorage.getItem("token");
+  const allow = store.state.routerPers.some((item) => item.router == to.name);
 
   if (!isLogined && to.name != "Login") {
     next({ path: "/Login" });
+  } else if (isLogined && !allow && to.name != "Main") {
+    next({ path: "/" });
   }
 
   next();
