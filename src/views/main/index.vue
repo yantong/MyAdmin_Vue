@@ -4,20 +4,29 @@
       <SideMenu v-if="menu" :menus="menu" />
     </el-aside>
     <el-container class="container">
-      <el-header class="header">
-        <div class="left"></div>
-        <div class="right">
-          <el-dropdown trigger="click" @command="handleCommand">
-            <div class="user-icon">
-              <img :src="headerImg" />
-            </div>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="logout">退出登录</el-dropdown-item>
-            </el-dropdown-menu>
-          </el-dropdown>
+      <el-header>
+        <div class="my-header">
+          <div class="left">
+            <Badge />
+          </div>
+          <div class="right">
+            <el-dropdown trigger="click" @command="handleCommand">
+              <div class="user-icon">
+                <img :src="headerImg" />
+              </div>
+              <el-dropdown-menu slot="dropdown">
+                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+              </el-dropdown-menu>
+            </el-dropdown>
+          </div>
         </div>
+        <RouteTags />
       </el-header>
-      <el-main class="route"><router-view /></el-main>
+      <el-main class="route">
+        <keep-alive>
+          <router-view />
+        </keep-alive>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -27,6 +36,8 @@ import { AxiosResponse } from "axios";
 import { Vue, Component } from "vue-property-decorator";
 import axios from "../../util/require";
 import SideMenu from "../../components/menu.vue";
+import RouteTags from "../../components/routeTags.vue";
+import Badge from "../../components/badge.vue";
 import mainRouter from "../../router/mainRouter";
 import { RouteConfig } from "vue-router";
 import { userRouter } from "../../define/index";
@@ -35,6 +46,8 @@ import store from "../../store/index";
 @Component({
   components: {
     SideMenu,
+    RouteTags,
+    Badge,
   },
 })
 export default class Login extends Vue {
@@ -80,7 +93,7 @@ export default class Login extends Vue {
 
       req.then((res: AxiosResponse) => {
         if (res.data.success) {
-          localStorage.setItem("isLogined", "");
+          localStorage.setItem("token", "");
 
           this.$router.push({ name: "Login" });
         }
@@ -95,16 +108,21 @@ export default class Login extends Vue {
   height: 100%;
 
   .aside {
-    background: #d3dce6;
+    background: #545c64;
     width: 210px !important;
   }
 
   .container {
-    .header {
-      background: #b3c0d1;
+    .el-header {
+      height: auto !important;
+      padding: 0;
+    }
 
+    .my-header {
       display: flex;
       justify-content: space-between;
+      box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+      padding: 2.5px 20px;
 
       .el-dropdown {
         height: 100%;

@@ -1,12 +1,19 @@
 <script lang="tsx">
 import { VNode } from "vue";
-import { Vue, Component, Prop } from "vue-property-decorator";
+import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import router from "../router";
 import { RouteConfig } from "vue-router";
 
 @Component
 export default class SideMenu extends Vue {
   @Prop({ default: () => [] }) readonly menus!: RouteConfig[];
+
+  defaultActive = "";
+
+  @Watch("$route")
+  onChildChanged(val: RouteConfig): void {
+    this.defaultActive = val?.name || "";
+  }
 
   getDefaultIndex(menus: RouteConfig[]): string | undefined {
     let index = undefined;
@@ -58,7 +65,13 @@ export default class SideMenu extends Vue {
 
   render(): VNode {
     return (
-      <el-menu router={true} default-active={this.getDefaultIndex(this.menus)}>
+      <el-menu
+        router={true}
+        default-active={this.defaultActive || this.getDefaultIndex(this.menus)}
+        background-color="#545c64"
+        text-color="#fff"
+        active-text-color="#ffd04b"
+      >
         {this.menus.map((item) => this.getItem(item))}
       </el-menu>
     );
