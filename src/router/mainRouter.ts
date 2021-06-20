@@ -37,5 +37,59 @@ const main: RouteConfig[] = [
       },
     ],
   },
+  {
+    path: "/route1",
+    name: "route1",
+    meta: {
+      text: "路由嵌套",
+    },
+    component: EmptyView,
+    children: [
+      {
+        path: "/route2-1",
+        name: "route2-1",
+        meta: {
+          text: "路由嵌套2-1",
+        },
+        component: EmptyView,
+      },
+      {
+        path: "/route2-2",
+        name: "route2-2",
+        meta: {
+          text: "路由嵌套2-2",
+        },
+        component: EmptyView,
+        children: [
+          {
+            path: "/route3-1",
+            name: "route3-1",
+            meta: {
+              text: "路由嵌套3-1",
+            },
+            component: EmptyView,
+          },
+          {
+            path: "/route3-2",
+            name: "route3-2",
+            meta: {
+              text: "路由嵌套3-2",
+            },
+            component: EmptyView,
+            children: [
+              {
+                path: "/route4-1",
+                name: "route4-1",
+                meta: {
+                  text: "路由嵌套4-1",
+                },
+                component: EmptyView,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
 ];
 export default main;

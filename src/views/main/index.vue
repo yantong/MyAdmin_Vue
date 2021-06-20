@@ -74,17 +74,21 @@ export default class Login extends Vue {
   }
 
   getPermission(router: RouteConfig): boolean {
+    let permission = false;
+
     if (!router.children) {
       return (router.meta.permission = this.routerPers.some(
         (item) => item.router == router.name
       ));
     }
 
-    return (
-      (router.meta.permission = router.children?.some((item) => {
-        return this.getPermission(item);
-      })) || false
-    );
+    for (let index = 0; index < router.children.length; index++) {
+      const element = router.children[index];
+
+      permission = this.getPermission(element) || false;
+    }
+
+    return (router.meta.permission = permission);
   }
 
   handleCommand(command: string): void {
